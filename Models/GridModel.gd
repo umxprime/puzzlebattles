@@ -144,7 +144,7 @@ func _fill():
 	for row in range(0, _rows):
 		for column in range(0, _columns):
 			pos = GridCoordinate.new(row, column)
-			type = randi() % (Cell.BlockType.O-Cell.BlockType.A+1) + Cell.BlockType.A
+			type = randi() % (Cell.BlockType.U-Cell.BlockType.A+1) + Cell.BlockType.A
 			cell = Cell.new(self, pos, type)
 			_cells.append(cell)
 

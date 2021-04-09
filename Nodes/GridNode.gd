@@ -28,6 +28,8 @@ func _ready():
 					blockInstance.get_node("I").visible = true
 				cell.BlockType.O:
 					blockInstance.get_node("O").visible = true
+				cell.BlockType.U:
+					blockInstance.get_node("U").visible = true
 			add_child(blockInstance)
 	pass # Replace with function body.
 
