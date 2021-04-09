@@ -6,6 +6,8 @@ class GridCoordinate:
 	func _init(row:int, column:int):
 		self.row = row
 		self.column = column
+	func _to_string():
+		return "row:%d,column:%d" % [self.row, self.column]
 	func copy() -> GridCoordinate:
 		return GridCoordinate.new(row, column)
 
@@ -16,23 +18,26 @@ class CursorModel:
 		_grid = grid
 		_pos = pos
 	func position()->GridCoordinate:
-		return _pos
+		return _pos.copy()
 	func moveTo(direction:int):
 		var newPos = _pos.copy()
 		match direction:
 			Direction.Up:
-				newPos.y += 1
+				newPos.row += 1
 			Direction.Down:
-				newPos.y -= 1
+				newPos.row -= 1
 			Direction.Left:
-				newPos.x -= 1
+				newPos.column -= 1
 			Direction.Right:
-				newPos.x += 1
-		if (newPos.x < 1 || newPos.x == _grid.columns() - 1):
+				newPos.column += 1
+		setPosition(newPos)
+	func setPosition(pos:GridCoordinate):
+		if (pos.column < 1 || pos.column == _grid.columns() - 1):
 			return
-		if (newPos.y < 0 || newPos.y == _grid.rows() - 1):
+		if (pos.row < 0 || pos.row == _grid.rows() - 1):
 			return
-		_pos = newPos
+		_pos.column = pos.column
+		_pos.row = pos.row
 
 class Cell:
 	enum BlockType {
@@ -53,12 +58,12 @@ class Cell:
 		_grid = grid
 		_type = type
 	func position() -> GridCoordinate:
-		return _pos
+		return _pos.copy()
 	func setPosition(pos:GridCoordinate):
 		_pos.row = pos.row
 		_pos.column = pos.column
 	func cellAt(location:int) -> Cell:
-		var pos = _pos.copy()
+		var pos = position()
 		match location:
 			Location.Over:
 				pos.row += 1
@@ -66,11 +71,17 @@ class Cell:
 				pos.row -= 1
 			Location.LeftSide:
 				pos.column -= 1
+				if pos.column%2==1:
+					pos.row +=1
 			Location.RightSide:
 				pos.column += 1
+				if pos.column%2==1:
+					pos.row +=1
 			_:
 				return null
 		return _grid.cellAt(pos)
+	func process(delta):
+		pass
 	
 
 enum Location {
@@ -116,9 +127,11 @@ func cellIndex(pos:GridCoordinate) -> int :
 func move(cell:Cell, pos:GridCoordinate):
 	cell.setPosition(pos)
 	_cells[cellIndex(pos)] = cell
+func cursor()->CursorModel:
+	return _cursor
 func swap(from:Cell, to:Cell):
-	var fromPos = from.position().copy()
-	var toPos = to.position().copy()
+	var fromPos = from.position()
+	var toPos = to.position()
 	move(from, toPos)
 	move(to, fromPos)
 func rotate(rotation:int):
@@ -147,17 +160,3 @@ func _fill():
 			type = randi() % (Cell.BlockType.U-Cell.BlockType.A+1) + Cell.BlockType.A
 			cell = Cell.new(self, pos, type)
 			_cells.append(cell)
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass

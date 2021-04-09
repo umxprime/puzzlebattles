@@ -2,10 +2,6 @@ extends Node2D
 
 class_name GridNode
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-
 var _block = preload("res://Block.tscn")
 var _gridModel:GridModel
 
@@ -17,23 +13,18 @@ func _ready():
 	for row in range(0,_gridModel.rows()):
 		for column in range(0,_gridModel.columns()):
 			var cell = _gridModel.cellAt(GridModel.GridCoordinate.new(row,column))
-			var blockInstance:Node2D = _block.instance()
-			blockInstance.position = Vector2(column*16 + 8, row*16 + 8 + (column%2) * 8)
-			match cell._type:
-				cell.BlockType.A:
-					blockInstance.get_node("A").visible = true
-				cell.BlockType.E:
-					blockInstance.get_node("E").visible = true
-				cell.BlockType.I:
-					blockInstance.get_node("I").visible = true
-				cell.BlockType.O:
-					blockInstance.get_node("O").visible = true
-				cell.BlockType.U:
-					blockInstance.get_node("U").visible = true
-			add_child(blockInstance)
-	pass # Replace with function body.
+			var block:BlockNode = _block.instance()
+			block.init(cell)
+			add_child(block)
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.pressed:
+			print("",event.button_index)
+			if event.button_index == 1:
+				_gridModel.rotate(GridModel.Rotation.Clockwise)
+			else:
+				_gridModel.rotate(GridModel.Rotation.CounterClockwize)
+			for child in get_children():
+				if child is BlockNode:
+					(child as BlockNode).updatePosition()
