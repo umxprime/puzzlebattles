@@ -20,7 +20,7 @@ class CursorModel:
 	func position()->GridCoordinate:
 		return _pos.copy()
 	func moveTo(direction:int):
-		var newPos = _pos.copy()
+		var newPos = position()
 		match direction:
 			Direction.Up:
 				newPos.row += 1
