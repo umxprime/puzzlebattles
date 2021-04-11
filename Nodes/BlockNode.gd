@@ -5,26 +5,31 @@ class_name BlockNode
 var _cell:GridModel.Cell
 var _visible:bool = true
 var _bounds:AABB
-
+var _half:Vector2
 func init(cell:GridModel.Cell, blockSize:int):
 	_cell = cell
 	_bounds.size.x = blockSize
 	_bounds.size.y = blockSize
+	_half = Vector2(_bounds.size.x / 2, _bounds.size.y / 2)
 	var node:MeshInstance2D = _node()
 	var mesh = node.mesh as QuadMesh
-	mesh.size.x = blockSize - 1
-	mesh.size.y = blockSize - 1
+	mesh.size.x = blockSize - 2
+	mesh.size.y = blockSize - 2
 	node.visible = _visible
+	updatePosition(false)
 	
-	updatePosition()
 
-func updatePosition():
-	var half:Vector2 = Vector2(_bounds.size.x / 2, _bounds.size.y / 2)
+func updatePosition(animate:bool=true):
 	var pos:Vector2
 	pos.x = _cell.position().column * _bounds.size.x 
-	pos.y = (_cell._grid.rows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * half.y
-	position = pos + half
+	pos.y = (_cell._grid.rows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * _half.y
 	_bounds.position = Vector3(pos.x, pos.y, 0)
+	if !animate:
+		position = pos + _half
+	else:
+		var tween:Tween = get_node("Tween")
+		tween.interpolate_property(self,"position",position,pos + _half,.1,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
+		tween.start()
 
 func setVisible(value:bool):
 	if value == _visible:
