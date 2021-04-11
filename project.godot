@@ -42,6 +42,11 @@ config/name="AEIO"
 run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
 
+[display]
+
+window/stretch/mode="viewport"
+window/stretch/aspect="expand"
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

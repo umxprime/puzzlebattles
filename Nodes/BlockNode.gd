@@ -8,6 +8,7 @@ var _bounds:AABB
 var _half:Vector2
 func init(cell:GridModel.Cell, blockSize:int):
 	_cell = cell
+	_bounds.position = Vector3(-blockSize/2, -blockSize/2, 0)
 	_bounds.size.x = blockSize
 	_bounds.size.y = blockSize
 	_half = Vector2(_bounds.size.x / 2, _bounds.size.y / 2)
@@ -23,7 +24,6 @@ func updatePosition(animate:bool=true):
 	var pos:Vector2
 	pos.x = _cell.position().column * _bounds.size.x 
 	pos.y = (_cell._grid.rows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * _half.y
-	_bounds.position = Vector3(pos.x, pos.y, 0)
 	if !animate:
 		position = pos + _half
 	else:
@@ -60,5 +60,12 @@ func _ready():
 
 func _input(event):
 	if event is InputEventMouseMotion:
-		if _bounds.has_point(Vector3(event.position.x, event.position.y, 0)) :
-			_cell._grid.cursor().setPosition(_cell.position())
+		if isOver(event.position):
+			moveCursorToBlock()
+
+func moveCursorToBlock():
+	_cell._grid.cursor().setPosition(_cell.position())
+
+func isOver(pos:Vector2):
+	var local_pos:Vector2 = make_canvas_position_local(pos)
+	return _bounds.has_point(Vector3(local_pos.x, local_pos.y, 0))

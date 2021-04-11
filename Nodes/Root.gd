@@ -3,7 +3,7 @@ extends Node2D
 class_name Root
 
 var _gridModel = GridModel.new(8, 10)
-var _gridNode = GridNode.new(_gridModel, 32)
+var _gridNode = GridNode.new(_gridModel, 50)
 
 # Declare member variables here. Examples:
 # var a = 2

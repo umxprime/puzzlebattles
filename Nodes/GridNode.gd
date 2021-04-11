@@ -9,8 +9,14 @@ var _blockSize:int
 func _init(gridModel:GridModel, blockSize:int):
 	_gridModel=gridModel
 	_blockSize=blockSize
+	
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	var width:int = _gridModel.columns() * _blockSize
+	var height:int = _gridModel.rows() * _blockSize + (_blockSize / 2)
+	var size = Vector2(width, height)
+	var viewportSize = (get_tree().get_root() as Viewport).size
+	position = (viewportSize - size) / 2
 	for row in range(0,_gridModel.rows()):
 		for column in range(0,_gridModel.columns()):
 			var cell = _gridModel.cellAt(GridModel.GridCoordinate.new(row,column))
@@ -21,7 +27,16 @@ func _ready():
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
-			print("",event.button_index)
+			var isOver:bool = false
+			for child in get_children():
+				if child is BlockNode:
+					if child.isOver(event.position):
+						isOver=true
+						child.moveCursorToBlock()
+				if isOver:
+					break
+			if !isOver:
+				return
 			if event.button_index == 1:
 				_gridModel.rotate(GridModel.Rotation.Clockwise)
 			else:
