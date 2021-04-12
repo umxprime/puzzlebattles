@@ -53,13 +53,20 @@ class Cell:
 	var _type:int
 	var _pos:GridCoordinate
 	var _grid:GridModel
+	var _needsDisplay:bool
 	func _init(grid:GridModel, pos:GridCoordinate, type = BlockType.Empty):
 		_pos = pos
 		_grid = grid
 		_type = type
+		_needsDisplay = true
+	func setNeedsDisplay(value:bool) :
+		_needsDisplay = value
+	func needsDisplay() -> bool :
+		return _needsDisplay
 	func position() -> GridCoordinate:
 		return _pos.copy()
 	func setPosition(pos:GridCoordinate):
+		_needsDisplay = true
 		_pos.row = pos.row
 		_pos.column = pos.column
 	func cellAt(location:int) -> Cell:

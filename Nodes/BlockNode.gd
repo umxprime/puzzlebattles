@@ -21,15 +21,22 @@ func init(cell:GridModel.Cell, blockSize:int):
 	
 
 func updatePosition(animate:bool=true):
+	if ! _cell.needsDisplay() :
+		return
 	var pos:Vector2
 	pos.x = _cell.position().column * _bounds.size.x 
 	pos.y = (_cell._grid.rows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * _half.y
 	if !animate:
 		position = pos + _half
+		_cell.setNeedsDisplay(false)
 	else:
 		var tween:Tween = get_node("Tween")
+		tween.connect("tween_completed",self,"_updatePositionCompleted")
 		tween.interpolate_property(self,"position",position,pos + _half,.1,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
 		tween.start()
+
+func _updatePositionCompleted(object:Object, key:NodePath):
+	_cell.setNeedsDisplay(false)
 
 func setVisible(value:bool):
 	if value == _visible:
