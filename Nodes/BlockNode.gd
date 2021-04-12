@@ -65,11 +65,6 @@ func _node() -> MeshInstance2D:
 func _ready():
 	pass # Replace with function body.
 
-func _input(event):
-	if event is InputEventMouseMotion:
-		if isOver(event.position):
-			moveCursorToBlock()
-
 func moveCursorToBlock():
 	_cell._grid.cursor().setPosition(_cell.position())
 

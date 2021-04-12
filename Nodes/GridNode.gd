@@ -24,19 +24,25 @@ func _ready():
 			block.init(cell, _blockSize)
 			add_child(block)
 
+func _overBlock(pos:Vector2) -> BlockNode:
+	for child in get_children():
+		if child is BlockNode:
+			if child.isOver(pos):
+				return child
+	return null
+
 func _input(event):
-	if event is InputEventMouseButton:
+	if event is InputEventMouseMotion:
+		var block:BlockNode = _overBlock(event.position)
+		if block == null:
+			return
+		block.moveCursorToBlock()
+	elif event is InputEventMouseButton:
 		if event.pressed:
-			var isOver:bool = false
-			for child in get_children():
-				if child is BlockNode:
-					if child.isOver(event.position):
-						isOver=true
-						child.moveCursorToBlock()
-				if isOver:
-					break
-			if !isOver:
+			var block:BlockNode = _overBlock(event.position)
+			if block == null:
 				return
+			block.moveCursorToBlock()
 			if event.button_index == 1:
 				_gridModel.rotate(GridModel.Rotation.Clockwise)
 			else:
