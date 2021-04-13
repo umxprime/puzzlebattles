@@ -32,10 +32,16 @@ class CursorModel:
 				newPos.column += 1
 		setPosition(newPos)
 	func setPosition(pos:GridCoordinate):
-		if (pos.column < 1 || pos.column == _grid.columns() - 1):
-			return
-		if (pos.row < 0 || pos.row == _grid.rows() - 1):
-			return
+		if (pos.column < 1):
+			pos.column = 1
+		if (pos.column >= _grid.columns() - 1):
+			if pos.column%2==1 && pos.row > 0:
+				pos.row -=1
+			pos.column = _grid.columns() - 2
+		if (pos.row < 0) :
+			pos.row = 0
+		if (pos.row >= _grid.rows() - 1):
+			pos.row = _grid.rows() - 2
 		_pos.column = pos.column
 		_pos.row = pos.row
 
