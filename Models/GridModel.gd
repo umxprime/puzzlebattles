@@ -17,9 +17,11 @@ class CursorModel:
 	func _init(grid:GridModel, pos:GridCoordinate):
 		_grid = grid
 		_pos = pos
+	func grid():
+		return _grid
 	func position()->GridCoordinate:
 		return _pos.copy()
-	func moveTo(direction:int):
+	func moveTo(direction:int) -> bool:
 		var newPos = position()
 		match direction:
 			Direction.Up:
@@ -30,8 +32,8 @@ class CursorModel:
 				newPos.column -= 1
 			Direction.Right:
 				newPos.column += 1
-		setPosition(newPos)
-	func setPosition(pos:GridCoordinate):
+		return setPosition(newPos)
+	func setPosition(pos:GridCoordinate) -> bool:
 		if (pos.column < 1):
 			pos.column = 1
 		if (pos.column >= _grid.columns() - 1):
@@ -42,8 +44,11 @@ class CursorModel:
 			pos.row = 0
 		if (pos.row >= _grid.rows() - 1):
 			pos.row = _grid.rows() - 2
+		if _pos.column == pos.column && _pos.row == pos.row:
+			return false
 		_pos.column = pos.column
 		_pos.row = pos.row
+		return true
 
 class Cell:
 	enum BlockType {

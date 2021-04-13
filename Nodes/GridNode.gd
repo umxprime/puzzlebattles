@@ -5,6 +5,7 @@ class_name GridNode
 var _block = preload("res://Block.tscn")
 var _gridModel:GridModel
 var _blockSize:int
+var _cursor:CursorNode
 
 func _init(gridModel:GridModel, blockSize:int):
 	_gridModel=gridModel
@@ -23,6 +24,8 @@ func _ready():
 			var block:BlockNode = _block.instance()
 			block.init(cell, _blockSize)
 			add_child(block)
+	_cursor = CursorNode.new(Vector2(_blockSize, _blockSize), _gridModel.cursor())
+	add_child(_cursor)
 
 func _overBlock(pos:Vector2) -> BlockNode:
 	for child in get_children():
@@ -34,15 +37,15 @@ func _overBlock(pos:Vector2) -> BlockNode:
 func _input(event):
 	if event is InputEventMouseMotion:
 		var block:BlockNode = _overBlock(event.position)
-		if block == null:
-			return
-		block.moveCursorToBlock()
+		if block != null:
+			if block.moveCursorToBlock() :
+				_cursor.updatePosition()
 	elif event is InputEventMouseButton:
 		if event.pressed:
 			var block:BlockNode = _overBlock(event.position)
-			if block == null:
-				return
-			block.moveCursorToBlock()
+			if block != null:
+				if block.moveCursorToBlock() :
+					_cursor.updatePosition()
 			if event.button_index == 1:
 				_gridModel.rotate(GridModel.Rotation.Clockwise)
 			else:

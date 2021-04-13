@@ -65,8 +65,8 @@ func _node() -> MeshInstance2D:
 func _ready():
 	pass # Replace with function body.
 
-func moveCursorToBlock():
-	_cell._grid.cursor().setPosition(_cell.position())
+func moveCursorToBlock() -> bool:
+	return _cell._grid.cursor().setPosition(_cell.position())
 
 func isOver(pos:Vector2):
 	var local_pos:Vector2 = make_canvas_position_local(pos)
