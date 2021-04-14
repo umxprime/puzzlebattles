@@ -42,8 +42,8 @@ class CursorModel:
 			pos.column = _grid.columns() - 2
 		if (pos.row < 0) :
 			pos.row = 0
-		if (pos.row >= _grid.rows() - 1):
-			pos.row = _grid.rows() - 2
+		if (pos.row >= _grid.visibleRows() - 1):
+			pos.row = _grid.visibleRows() - 2
 		if _pos.column == pos.column && _pos.row == pos.row:
 			return false
 		_pos.column = pos.column
@@ -124,16 +124,20 @@ enum Rotation {
 var _cells=[]
 var _columns:int
 var _rows:int
+var _visibleRows:int
 var _cursor:CursorModel
 func _init(columns:int, rows:int):
 	_columns = columns
-	_rows = rows
+	_visibleRows = rows
+	_rows = rows * 2
 	_cursor = CursorModel.new(self, GridCoordinate.new(rows / 2, columns / 2))
 	_fill()
 func cells() -> Array:
 	return _cells.duplicate()
 func columns() -> int :
 	return _columns
+func visibleRows() -> int :
+	return _visibleRows
 func rows() -> int :
 	return _rows
 func cellAt(pos:GridCoordinate) -> Cell :

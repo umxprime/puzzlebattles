@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 class_name GridNode
 
@@ -13,11 +13,13 @@ func _init(gridModel:GridModel, blockSize:int):
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	rect_clip_content = true
 	var width:int = _gridModel.columns() * _blockSize
-	var height:int = _gridModel.rows() * _blockSize + (_blockSize / 2)
+	var height:int = _gridModel.visibleRows() * _blockSize + (_blockSize / 2)
 	var size = Vector2(width, height)
+	rect_size = size
 	var viewportSize = (get_tree().get_root() as Viewport).size
-	position = (viewportSize - size) / 2
+	rect_position = (viewportSize - size) / 2
 	for row in range(0,_gridModel.rows()):
 		for column in range(0,_gridModel.columns()):
 			var cell = _gridModel.cellAt(GridModel.GridCoordinate.new(row,column))

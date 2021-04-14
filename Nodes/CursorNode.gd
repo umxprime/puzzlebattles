@@ -39,4 +39,4 @@ func _draw():
 #	pass
 func updatePosition():
 	position.x = (_model.position().column * _cellSize.x) - _cellSize.x
-	position.y = ((_model.grid().rows() - _model.position().row - 2.5) * _cellSize.y) + (_cellSize.y * 0.5 * (_model.position().column%2))
+	position.y = ((_model.grid().visibleRows() - _model.position().row - 2.5) * _cellSize.y) + (_cellSize.y * 0.5 * (_model.position().column%2))

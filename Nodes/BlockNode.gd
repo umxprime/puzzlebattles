@@ -25,7 +25,7 @@ func updatePosition(animate:bool=true):
 		return
 	var pos:Vector2
 	pos.x = _cell.position().column * _bounds.size.x 
-	pos.y = (_cell._grid.rows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * _half.y
+	pos.y = (_cell._grid.visibleRows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * _half.y
 	if !animate:
 		position = pos + _half
 		_cell.setNeedsDisplay(false)
