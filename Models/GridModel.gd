@@ -65,6 +65,10 @@ class Cell:
 	var _pos:GridCoordinate
 	var _grid:GridModel
 	var _needsDisplay:bool
+	
+	static func shuffleType()->int:
+		return randi() % (Cell.BlockType.U-Cell.BlockType.A+1) + Cell.BlockType.A
+		
 	func _init(grid:GridModel, pos:GridCoordinate, type = BlockType.Empty):
 		_pos = pos
 		_grid = grid
@@ -74,6 +78,10 @@ class Cell:
 		_needsDisplay = value
 	func needsDisplay() -> bool :
 		return _needsDisplay
+	func type()->int:
+		return _type
+	func setType(type:int):
+		_type = type
 	func position() -> GridCoordinate:
 		return _pos.copy()
 	func setPosition(pos:GridCoordinate):
@@ -156,6 +164,27 @@ func swap(from:Cell, to:Cell):
 	var toPos = to.position()
 	move(from, toPos)
 	move(to, fromPos)
+func breakSingle(cell:Cell):
+	cell.setType(Cell.BlockType.Empty)
+	while cell.cellAt(Location.Over) != null :
+		swap(cell, cell.cellAt(Location.Over))
+func breakDiamond():
+	var cell = cellAt(_cursor.position())
+	if cell.needsDisplay() :
+		return
+	var over = cell.cellAt(Location.Over)
+	if over.needsDisplay() :
+		return
+	var left = cell.cellAt(Location.LeftSide)
+	if left.needsDisplay() :
+		return
+	var right = cell.cellAt(Location.RightSide)
+	if right.needsDisplay() :
+		return
+	breakSingle(cell)
+	breakSingle(over)
+	breakSingle(left)
+	breakSingle(right)
 func rotate(rotation:int):
 		var cell = cellAt(_cursor.position())
 		var over = cell.cellAt(Location.Over)
@@ -179,6 +208,5 @@ func _fill():
 	for row in range(0, _rows):
 		for column in range(0, _columns):
 			pos = GridCoordinate.new(row, column)
-			type = randi() % (Cell.BlockType.U-Cell.BlockType.A+1) + Cell.BlockType.A
-			cell = Cell.new(self, pos, type)
+			cell = Cell.new(self, pos, Cell.shuffleType())
 			_cells.append(cell)

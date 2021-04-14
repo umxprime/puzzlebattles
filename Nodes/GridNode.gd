@@ -55,3 +55,9 @@ func _input(event):
 			for child in get_children():
 				if child is BlockNode:
 					(child as BlockNode).updatePosition()
+	elif event is InputEventKey:
+		if event.pressed && event.scancode == KEY_SPACE:
+			_gridModel.breakDiamond()
+			for child in get_children():
+				if child is BlockNode:
+					(child as BlockNode).updatePosition()

@@ -6,6 +6,8 @@ var _cell:GridModel.Cell
 var _visible:bool = true
 var _bounds:AABB
 var _half:Vector2
+var _isUpdatingPosition:bool = false
+
 func init(cell:GridModel.Cell, blockSize:int):
 	_cell = cell
 	_bounds.position = Vector3(-blockSize/2, -blockSize/2, 0)
@@ -21,22 +23,34 @@ func init(cell:GridModel.Cell, blockSize:int):
 	
 
 func updatePosition(animate:bool=true):
-	if ! _cell.needsDisplay() :
+	if !_cell.needsDisplay() || _isUpdatingPosition:
 		return
 	var pos:Vector2
 	pos.x = _cell.position().column * _bounds.size.x 
 	pos.y = (_cell._grid.visibleRows()-_cell.position().row-1)*_bounds.size.y + (_cell.position().column%2) * _half.y
-	if !animate:
+	var isEmpty = _cell.type() == GridModel.Cell.BlockType.Empty
+	if isEmpty:
+		_cell.setType(GridModel.Cell.shuffleType())
+		_resetVisibility()
+		setVisible(true)
+	if !animate || isEmpty:
 		position = pos + _half
 		_cell.setNeedsDisplay(false)
 	else:
 		var tween:Tween = get_node("Tween")
-		tween.connect("tween_completed",self,"_updatePositionCompleted")
 		tween.interpolate_property(self,"position",position,pos + _half,.1,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
+		_isUpdatingPosition = true
 		tween.start()
 
 func _updatePositionCompleted(object:Object, key:NodePath):
 	_cell.setNeedsDisplay(false)
+	_isUpdatingPosition = false
+
+func _resetVisibility():
+	_visible = false
+	for child in get_children():
+		if child is Node2D:
+			child.visible = false
 
 func setVisible(value:bool):
 	if value == _visible:
@@ -63,7 +77,8 @@ func _node() -> MeshInstance2D:
 			return null
 
 func _ready():
-	pass # Replace with function body.
+	var tween:Tween = get_node("Tween")
+	tween.connect("tween_completed",self,"_updatePositionCompleted")
 
 func moveCursorToBlock() -> bool:
 	return _cell._grid.cursor().setPosition(_cell.position())
