@@ -3,7 +3,7 @@ extends Control
 class_name Root
 
 var _gridModel = GridModel.new(8, 10)
-var _gridNode = GridNode.new(_gridModel, 50)
+var _gridNode = GridNode.new(_gridModel, Vector2(46,50))
 
 # Declare member variables here. Examples:
 # var a = 2

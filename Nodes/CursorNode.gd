@@ -1,14 +1,11 @@
 extends Node2D
 
 class_name CursorNode
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
 
 var _cellSize:Vector2
-var _model:GridModel.CursorModel
+var _model:CursorModel
 
-func _init(cellSize:Vector2, model:GridModel.CursorModel):
+func _init(cellSize:Vector2, model:CursorModel):
 	_cellSize = cellSize
 	_model = model
 # Called when the node enters the scene tree for the first time.

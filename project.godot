@@ -9,15 +9,35 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Reference",
+"class": "BlockModel",
+"language": "GDScript",
+"path": "res://Models/BlockModel.gd"
+}, {
 "base": "Node2D",
 "class": "BlockNode",
 "language": "GDScript",
 "path": "res://Nodes/BlockNode.gd"
 }, {
+"base": "Reference",
+"class": "CursorModel",
+"language": "GDScript",
+"path": "res://Models/CursorModel.gd"
+}, {
 "base": "Node2D",
 "class": "CursorNode",
 "language": "GDScript",
 "path": "res://Nodes/CursorNode.gd"
+}, {
+"base": "Object",
+"class": "Enums",
+"language": "GDScript",
+"path": "res://Models/Enums.gd"
+}, {
+"base": "Reference",
+"class": "GridCoordinate",
+"language": "GDScript",
+"path": "res://Models/GridCoordinate.gd"
 }, {
 "base": "Reference",
 "class": "GridModel",
@@ -35,8 +55,12 @@ _global_script_classes=[ {
 "path": "res://Nodes/Root.gd"
 } ]
 _global_script_class_icons={
+"BlockModel": "",
 "BlockNode": "",
+"CursorModel": "",
 "CursorNode": "",
+"Enums": "",
+"GridCoordinate": "",
 "GridModel": "",
 "GridNode": "",
 "Root": ""
