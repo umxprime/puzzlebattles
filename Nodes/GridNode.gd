@@ -2,7 +2,7 @@ extends Control
 
 class_name GridNode
 
-var _block = preload("res://Block.tscn")
+var _block = preload("res://Scenes/Block.tscn")
 var _model:GridModel
 var _blockSize:Vector2
 var _cursor:CursorNode
