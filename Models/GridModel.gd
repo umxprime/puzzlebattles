@@ -3,17 +3,31 @@ class_name GridModel
 class Diamond:
 	var _down:BlockModel
 	var _left:BlockModel
-	var _top:BlockModel
+	var _up:BlockModel
 	var _right:BlockModel
-	func _init(down:BlockModel, left:BlockModel, top:BlockModel, right:BlockModel):
+	func _init(down:BlockModel, left:BlockModel, up:BlockModel, right:BlockModel):
 		_down = down
 		_left = left
-		_top = top
+		_up = up
 		_right = right
 	func blocks() -> Array:
-		return [_down, _left, _top, _right]
+		return [_down, _left, _up, _right]
 	func haveSameType() -> bool:
-		return _down.type() == _left.type() && _left.type() == _top.type() && _top.type() == _right.type()
+		return _down.type() == _left.type() && _left.type() == _up.type() && _up.type() == _right.type()
+	func rotate(rotation:int):
+		var grid:GridModel = _down.grid()
+		if grid==null:return
+		match rotation:
+			Enums.Rotation.Clockwise:
+				grid.swap(_down,_right)
+				grid.swap(_down,_up)
+				grid.swap(_down,_left)
+			Enums.Rotation.CounterClockwize:
+				grid.swap(_down,_left)
+				grid.swap(_down,_up)
+				grid.swap(_down,_right)
+			_:
+				pass
 
 var _blocks:Array
 var _columns:int
@@ -110,36 +124,15 @@ func breakSingle(block:BlockModel):
 	while block.blockAt(Enums.Location.Over) != null :
 		swap(block, block.blockAt(Enums.Location.Over))
 func breakDiamond():
-	var block = blockAt(_cursor.position())
-	if block.needsDisplay() :
-		return
-	var over = block.blockAt(Enums.Location.Over)
-	if over.needsDisplay() :
-		return
-	var left = block.blockAt(Enums.Location.LeftSide)
-	if left.needsDisplay() :
-		return
-	var right = block.blockAt(Enums.Location.RightSide)
-	if right.needsDisplay() :
-		return
-	breakSingle(block)
-	breakSingle(over)
-	breakSingle(left)
-	breakSingle(right)
+	var pos: Dictionary = _cursor.position()
+	var diamond: Diamond = _diamondAt(pos.row, pos.column)
+	if diamond == null: return
+	for block in diamond.blocks():
+		breakSingle(block)
 func rotate(rotation:int):
-		var block = blockAt(_cursor.position())
-		var over = block.blockAt(Enums.Location.Over)
-		var left = block.blockAt(Enums.Location.LeftSide)
-		var right = block.blockAt(Enums.Location.RightSide)
-		match rotation:
-			Enums.Rotation.Clockwise:
-				swap(block,right)
-				swap(block,over)
-				swap(block,left)
-			Enums.Rotation.CounterClockwize:
-				swap(block,left)
-				swap(block,over)
-				swap(block,right)
-			_:
-				pass
-		_evaluate()
+	var pos: Dictionary = _cursor.position()
+	var diamond: Diamond = _diamondAt(pos.row, pos.column)
+	if diamond == null: return
+	diamond.rotate(rotation)
+	
+	_evaluate()
