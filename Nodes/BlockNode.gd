@@ -2,47 +2,53 @@ extends Node2D
 
 class_name BlockNode
 
-var _model:BlockModel
 var _visible:bool = true
-var _bounds:AABB
+var _bounds:Rect2
 var _half:Vector2
 var _isUpdatingPosition:bool = false
+var _typeNode:MeshInstance2D
 
-func init(model:BlockModel, blockSize:Vector2):
-	_model = model
-	_bounds.position = Vector3(-blockSize.x/2, -blockSize.y/2, 0)
-	_bounds.size = Vector3(blockSize.x, blockSize.y, 0)
-	_half = Vector2(_bounds.size.x / 2, _bounds.size.y / 2)
-	var node:MeshInstance2D = _node()
-	var mesh = node.mesh as QuadMesh
-	mesh.size = blockSize - Vector2(2,2)
-	node.visible = _visible
-	updatePosition(false)
+func init(blockSize:Vector2):
+	_bounds.position = - blockSize / 2
+	_bounds.size = blockSize
+	_half = blockSize / 2
 	
 
-func updatePosition(animate:bool=true):
-	if !_model.needsDisplay() || _isUpdatingPosition:
-		return
+func configure(model):
+	_typeNode = _node(model)
+	var mesh = _typeNode.mesh as QuadMesh
+	mesh.size = _bounds.size - Vector2(2,2)
+	_typeNode.visible = _visible
 	var pos:Vector2
-	pos.x = _model.position().column * _bounds.size.x 
-	pos.y = (_model._grid.visibleRows()-_model.position().row-1)*_bounds.size.y + (_model.position().column%2) * _half.y
-	var isEmpty = _model.type() == Enums.BlockType.Empty
-	if isEmpty:
-		_model.setType(BlockModel.shuffleType())
-		_resetVisibility()
-		setVisible(true)
-	if !animate || isEmpty:
-		position = pos + _half
-		_model.setNeedsDisplay(false)
-	else:
-		var tween:Tween = get_node("Tween")
-		tween.interpolate_property(self,"position",position,pos + _half,.1,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
-		_isUpdatingPosition = true
-		tween.start()
+	pos.x = model.position.column * _bounds.size.x 
+	pos.y = (model.rows - model.position.row - 1) * _bounds.size.y + (model.position.column % 2) * _half.y
+	position = pos + _half
+#	updatePosition(false)
+	
 
-func _updatePositionCompleted(object:Object, key:NodePath):
-	_model.setNeedsDisplay(false)
-	_isUpdatingPosition = false
+#func updatePosition(animate:bool=true):
+#	if !_model.needsDisplay() || _isUpdatingPosition:
+#		return
+#	var pos:Vector2
+#	pos.x = _model.position().column * _bounds.size.x 
+#	pos.y = (_model._grid.visibleRows()-_model.position().row-1)*_bounds.size.y + (_model.position().column%2) * _half.y
+#	var isEmpty = _model.type() == Enums.BlockType.Empty
+#	if isEmpty:
+#		_model.setType(BlockModel.shuffleType())
+#		_resetVisibility()
+#		setVisible(true)
+#	if !animate || isEmpty:
+#		position = pos + _half
+#		_model.setNeedsDisplay(false)
+#	else:
+#
+#		tween.interpolate_property(self,"position",position,pos + _half,.1,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
+#		_isUpdatingPosition = true
+#		tween.start()
+
+#func _updatePositionCompleted(object:Object, key:NodePath):
+#	_model.setNeedsDisplay(false)
+#	_isUpdatingPosition = false
 
 func _resetVisibility():
 	_visible = false
@@ -54,13 +60,12 @@ func setVisible(value:bool):
 	if value == _visible:
 		return
 	_visible = value
-	var node:Node2D = _node()
-	if node == null:
+	if _typeNode == null:
 		return
-	node.visible = value
+	_typeNode.visible = value
 
-func _node() -> MeshInstance2D:
-	match _model.type():
+func _node(model) -> MeshInstance2D:
+	match model.type:
 		Enums.BlockType.A:
 			return get_node("A") as MeshInstance2D
 		Enums.BlockType.E:
@@ -75,12 +80,14 @@ func _node() -> MeshInstance2D:
 			return null
 
 func _ready():
-	var tween:Tween = get_node("Tween")
-	tween.connect("tween_completed",self,"_updatePositionCompleted")
+	pass
+#	var tween:Tween = get_node("Tween")
+#	tween.connect("tween_completed",self,"_updatePositionCompleted")
 
 func moveCursorToBlock() -> bool:
-	return _model.grid().cursor().setPosition(_model.position())
+	return false
+#	return _model.grid().cursor().setPosition(_model.position())
 
 func isOver(pos:Vector2):
 	var local_pos:Vector2 = make_canvas_position_local(pos)
-	return _bounds.has_point(Vector3(local_pos.x, local_pos.y, 0))
+	return _bounds.has_point(local_pos)

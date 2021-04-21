@@ -15,17 +15,30 @@ class Diamond:
 	func haveSameType() -> bool:
 		return _down.type() == _left.type() && _left.type() == _top.type() && _top.type() == _right.type()
 
-var _blocks=[]
+var _blocks:Array
 var _columns:int
 var _rows:int
 var _visibleRows:int
 var _cursor:CursorModel
-func _init(columns:int, rows:int):
-	_columns = columns
-	_visibleRows = rows
-	_rows = rows * 2
-	_cursor = CursorModel.new(self, GridCoordinate.new(rows / 2, columns / 2))
-	_fill()
+var _node:Node
+var _dimensions
+func _init(node, blocks, cursor, dimensions):
+	_blocks = blocks
+	_node = node
+	_dimensions = dimensions
+	_cursor = cursor
+	_node.connect("ready", self, "_onViewReady")
+	
+func _onViewReady():
+	var model = {
+		visibleRows = _visibleRows,
+		rows = _rows,
+		columns = _columns,
+		blocks = _blocks.duplicate()
+	}
+	_node.configure(model)
+func node():
+	return _node
 func blocks() -> Array:
 	return _blocks.duplicate()
 func columns() -> int :
@@ -38,13 +51,31 @@ func _blockAt(row, column) -> BlockModel :
 	if (row < 0 || row + 1 > _rows || column < 0 || column + 1 > _columns) :
 		return null
 	return _blocks[_blockIndex(row, column)]
-func blockAt(pos:GridCoordinate) -> BlockModel :
+func blockAt(pos:Dictionary) -> BlockModel :
 	return _blockAt(pos.row, pos.column)
+func blockRelativeTo(block, location:int) -> BlockModel:
+	var pos = block.position()
+	match location:
+		Enums.Location.Over:
+			pos.row += 1
+		Enums.Location.Under:
+			pos.row -= 1
+		Enums.Location.LeftSide:
+			pos.column -= 1
+			if pos.column%2==1:
+				pos.row +=1
+		Enums.Location.RightSide:
+			pos.column += 1
+			if pos.column%2==1:
+				pos.row +=1
+		_:
+			return null
+	return blockAt(pos)
 func _blockIndex(row, column) -> int:
 	return column + row * _columns
-func blockIndex(pos:GridCoordinate) -> int :
+func blockIndex(pos:Dictionary) -> int :
 	return _blockIndex(pos.row, pos.column)
-func move(block:BlockModel, pos:GridCoordinate):
+func move(block:BlockModel, pos:Dictionary):
 	block.setPosition(pos)
 	_blocks[blockIndex(pos)] = block
 func _evaluate():
@@ -112,12 +143,3 @@ func rotate(rotation:int):
 			_:
 				pass
 		_evaluate()
-func _fill():
-	var block:BlockModel
-	var pos:GridCoordinate
-	var type:int
-	for row in range(0, _rows):
-		for column in range(0, _columns):
-			pos = GridCoordinate.new(row, column)
-			block = BlockModel.new(self, pos, BlockModel.shuffleType())
-			_blocks.append(block)

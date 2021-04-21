@@ -1,33 +1,29 @@
-extends Control
+extends Node2D
 
 class_name GridNode
 
-var _block = preload("res://Scenes/Block.tscn")
-var _model:GridModel
-var _blockSize:Vector2
+
+var _blockSize:Dictionary
 var _cursor:CursorNode
 
-func _init(model:GridModel, blockSize:Vector2):
-	_model=model
-	_blockSize=blockSize
+signal rotate
+signal breakDiamond
+
+func _init(size):
+	_blockSize=size
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	rect_clip_content = true
-	var width:int = _model.columns() * _blockSize.x
-	var height:int = _model.visibleRows() * _blockSize.y + (_blockSize.y / 2)
-	var size = Vector2(width, height)
-	rect_size = size
-	var viewportSize = (get_tree().get_root() as Viewport).size
-	rect_position = (viewportSize - size) / 2
-	for row in range(0,_model.rows()):
-		for column in range(0,_model.columns()):
-			var model = _model.blockAt(GridCoordinate.new(row,column))
-			var node:BlockNode = _block.instance()
-			node.init(model, _blockSize)
-			add_child(node)
-	_cursor = CursorNode.new(_blockSize, _model.cursor())
-	add_child(_cursor)
+	pass
+
+func configure(model):
+	var node
+	for block in model.blocks:
+		node = block.node()
+		node.init(Vector2(_blockSize.width, _blockSize.height))
+		add_child(node)
+#	_cursor = CursorNode.new(_blockSize, _model.cursor())
+#	add_child(_cursor)
 
 func _overBlock(pos:Vector2) -> BlockNode:
 	for child in get_children():
@@ -37,27 +33,31 @@ func _overBlock(pos:Vector2) -> BlockNode:
 	return null
 
 func _input(event):
-	if event is InputEventMouseMotion:
-		var block:BlockNode = _overBlock(event.position)
-		if block != null:
-			if block.moveCursorToBlock() :
-				_cursor.updatePosition()
-	elif event is InputEventMouseButton:
-		if event.pressed:
-			var block:BlockNode = _overBlock(event.position)
-			if block != null:
-				if block.moveCursorToBlock() :
-					_cursor.updatePosition()
-			if event.button_index == 1:
-				_model.rotate(Enums.Rotation.Clockwise)
-			else:
-				_model.rotate(Enums.Rotation.CounterClockwize)
-			for child in get_children():
-				if child is BlockNode:
-					(child as BlockNode).updatePosition()
-	elif event is InputEventKey:
-		if event.pressed && event.scancode == KEY_SPACE:
-			_model.breakDiamond()
-			for child in get_children():
-				if child is BlockNode:
-					(child as BlockNode).updatePosition()
+	pass
+#	if event is InputEventMouseMotion:
+#		var block:BlockNode = _overBlock(event.position)
+#		if block != null:
+#			if block.moveCursorToBlock() :
+#				_cursor.updatePosition()
+#	elif event is InputEventMouseButton:
+#		if event.pressed:
+#			var block:BlockNode = _overBlock(event.position)
+#			if block != null:
+#				if block.moveCursorToBlock() :
+#					_cursor.updatePosition()
+#			if event.button_index == 1:
+#				emit_signal("rotate", Enums.Rotation.Clockwise)
+##				_model.rotate(Enums.Rotation.Clockwise)
+#			else:
+#				emit_signal("rotate", Enums.Rotation.CounterClockwize)
+##				_model.rotate(Enums.Rotation.CounterClockwize)
+#			for child in get_children():
+#				if child is BlockNode:
+#					(child as BlockNode).updatePosition()
+#	elif event is InputEventKey:
+#		if event.pressed && event.scancode == KEY_SPACE:
+##			_model.breakDiamond()
+#			emit_signal("breakDiamond")
+#			for child in get_children():
+#				if child is BlockNode:
+#					(child as BlockNode).updatePosition()

@@ -35,16 +35,11 @@ _global_script_classes=[ {
 "path": "res://Models/Enums.gd"
 }, {
 "base": "Reference",
-"class": "GridCoordinate",
-"language": "GDScript",
-"path": "res://Models/GridCoordinate.gd"
-}, {
-"base": "Reference",
 "class": "GridModel",
 "language": "GDScript",
 "path": "res://Models/GridModel.gd"
 }, {
-"base": "Control",
+"base": "Node2D",
 "class": "GridNode",
 "language": "GDScript",
 "path": "res://Nodes/GridNode.gd"
@@ -60,7 +55,6 @@ _global_script_class_icons={
 "CursorModel": "",
 "CursorNode": "",
 "Enums": "",
-"GridCoordinate": "",
 "GridModel": "",
 "GridNode": "",
 "Root": ""

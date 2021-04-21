@@ -3,11 +3,13 @@ extends Node2D
 class_name CursorNode
 
 var _cellSize:Vector2
-var _model:CursorModel
 
-func _init(cellSize:Vector2, model:CursorModel):
-	_cellSize = cellSize
-	_model = model
+func _init(dimensions):
+	_cellSize = Vector2(dimensions.width, dimensions.height)
+
+func configure(state):
+	updatePosition(state)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -34,6 +36,6 @@ func _draw():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
-func updatePosition():
-	position.x = (_model.position().column * _cellSize.x) - _cellSize.x
-	position.y = ((_model.grid().visibleRows() - _model.position().row - 2.5) * _cellSize.y) + (_cellSize.y * 0.5 * (_model.position().column%2))
+func updatePosition(model):
+	position.x = (model.position.column * _cellSize.x) - _cellSize.x
+	position.y = ((model.grid.rows - model.position.row - 2.5) * _cellSize.y) + (_cellSize.y * 0.5 * (model.position.column%2))

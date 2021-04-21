@@ -94,5 +94,3 @@ mesh = SubResource( 4 )
 visible = false
 material = SubResource( 8 )
 mesh = SubResource( 4 )
-
-[node name="Tween" type="Tween" parent="."]
