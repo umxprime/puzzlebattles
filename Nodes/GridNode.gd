@@ -2,6 +2,31 @@ extends Node2D
 
 class_name GridNode
 
+class DiamondRotateAnimation:
+	var _tween:Tween
+	var _blocks:Array
+	var _parent:Node
+	var _started:bool
+	signal finished
+	func _init(parent:Node, blocks:Array):
+		_blocks = blocks
+		_parent = parent
+		_tween = Tween.new()
+		_started = false
+	func started() -> bool:
+		return _started
+	func start():
+		if _started:return
+		_started = true
+		_parent.add_child(_tween)
+		_tween.connect("tween_all_completed", self, "_finished")
+		for block in _blocks:
+			var node:Node2D = block.node
+			var pos:Vector2 = block.pos
+			_tween.interpolate_property(node, "position", node.position, pos,.1,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
+		_tween.start()
+	func _finished():
+		emit_signal("finished")
 
 var _blockSize:Dictionary
 var _cursor:CursorNode
