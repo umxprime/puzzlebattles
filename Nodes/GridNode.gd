@@ -37,10 +37,6 @@ signal mouseMoved
 
 func _init(size):
 	_blockSize=size
-	
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass
 
 func configure(model):
 	var node
@@ -48,25 +44,12 @@ func configure(model):
 		node = block.node()
 		node.init(Vector2(_blockSize.width, _blockSize.height))
 		add_child(node)
-#	_cursor = CursorNode.new(_blockSize, _model.cursor())
-#	add_child(_cursor)
-
-func _overBlock(pos:Vector2) -> BlockNode:
-	for child in get_children():
-		if child is BlockNode:
-			if child.isOver(pos):
-				return child
-	return null
 
 func _input(event):
 	pass
 	if event is InputEventMouseMotion:
 		var local = make_canvas_position_local(event.position)
 		emit_signal("mouseMoved", {x = local.x, y = local.y})
-#		var block:BlockNode = _overBlock(event.position)
-#		if block != null:
-#			if block.moveCursorToBlock() :
-#				_cursor.updatePosition()
 #	elif event is InputEventMouseButton:
 #		if event.pressed:
 #			var block:BlockNode = _overBlock(event.position)

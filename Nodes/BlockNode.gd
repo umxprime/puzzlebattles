@@ -86,10 +86,6 @@ func _ready():
 #	var tween:Tween = get_node("Tween")
 #	tween.connect("tween_completed",self,"_updatePositionCompleted")
 
-func moveCursorToBlock() -> bool:
-	return false
-#	return _model.grid().cursor().setPosition(_model.position())
-
 func isOver(pos:Vector2):
 	var local_pos:Vector2 = make_canvas_position_local(pos)
 	return _bounds.has_point(local_pos)
