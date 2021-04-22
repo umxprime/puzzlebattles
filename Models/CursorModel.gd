@@ -34,7 +34,7 @@ func _columnsRange() -> PoolIntArray :
 	return PoolIntArray([1, _grid.columns - 2])
 func _rowsRange() -> PoolIntArray :
 	return PoolIntArray([0, _grid.rows - 2])
-func setPosition(pos) -> bool:
+func setPosition(pos):
 	if (pos.column < _columnsRange()[0]):
 		pos.column = _columnsRange()[0]
 	if (pos.column > _columnsRange()[1]):
@@ -46,7 +46,11 @@ func setPosition(pos) -> bool:
 	if (pos.row > _rowsRange()[1]):
 		pos.row = _rowsRange()[1]
 	if _pos.column == pos.column && _pos.row == pos.row:
-		return false
+		return
 	_pos.column = pos.column
 	_pos.row = pos.row
-	return true
+	var state = {
+		position = _pos,
+		grid = _grid
+	}
+	_node.configure(state)

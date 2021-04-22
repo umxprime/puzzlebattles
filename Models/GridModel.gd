@@ -42,15 +42,20 @@ func _init(node, blocks, cursor, dimensions):
 	_dimensions = dimensions
 	_cursor = cursor
 	_node.connect("ready", self, "_onViewReady")
-	
+	_node.connect("mouseMoved", self, "_onMouseMoved")
 func _onViewReady():
 	var model = {
-		visibleRows = _visibleRows,
-		rows = _rows,
-		columns = _columns,
 		blocks = _blocks.duplicate()
 	}
 	_node.configure(model)
+func _onMouseMoved(pos):
+	var state = {
+		position = pos,
+		dimensions = _dimensions
+	}
+	var block = BlockModel.nodePositionToGrid(state)
+	print(block)
+	_cursor.setPosition(block)
 func node():
 	return _node
 func blocks() -> Array:

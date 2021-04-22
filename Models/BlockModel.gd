@@ -52,20 +52,31 @@ func _init(state:Dictionary):
 func _onViewReady():
 	var model = {
 		type = _state.type,
-		position = _gridToNodePosition()
+		position = gridToNodePosition(_state)
 	}
 	_state.node.configure(model)
 
-func _gridToNodePosition() -> Dictionary:
-	var position = {}
-	var row = _state.position.row
-	var column = _state.position.column
-	var totalRows = _state.dimensions.grid.rows + _state.dimensions.grid.buffer
-	var width = _state.dimensions.block.width
-	var height = _state.dimensions.block.height
-	position.x = column * width 
-	position.y = (totalRows - row - 1) * height + (column % 2) * height / 2
-	return position
+static func gridToNodePosition(state) -> Dictionary:
+	var row = state.position.row
+	var column = state.position.column
+	var totalRows = state.dimensions.grid.rows + state.dimensions.grid.buffer
+	var width = state.dimensions.block.width
+	var height = state.dimensions.block.height
+	var offset = (column % 2) * height / 2
+	var x = column * width 
+	var y = (totalRows - row - 1) * height + offset
+	return {x = x, y = y}
+
+static func nodePositionToGrid(state) -> Dictionary:
+	var x = state.position.x
+	var y = state.position.y
+	var totalRows = state.dimensions.grid.rows + state.dimensions.grid.buffer
+	var width = state.dimensions.block.width
+	var height = state.dimensions.block.height
+	var column = int(x / width)
+	var offset = (column % 2) * height / 2
+	var row =  int(totalRows - ((y - offset) / height))
+	return {row = row, column = column}
 
 func node():
 	return _state.node

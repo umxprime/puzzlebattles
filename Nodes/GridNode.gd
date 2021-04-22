@@ -33,6 +33,7 @@ var _cursor:CursorNode
 
 signal rotate
 signal breakDiamond
+signal mouseMoved
 
 func _init(size):
 	_blockSize=size
@@ -59,7 +60,9 @@ func _overBlock(pos:Vector2) -> BlockNode:
 
 func _input(event):
 	pass
-#	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion:
+		var local = make_canvas_position_local(event.position)
+		emit_signal("mouseMoved", {x = local.x, y = local.y})
 #		var block:BlockNode = _overBlock(event.position)
 #		if block != null:
 #			if block.moveCursorToBlock() :

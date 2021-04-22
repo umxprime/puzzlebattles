@@ -19,7 +19,7 @@ func _createGrid(cursor, dimensions) -> GridModel :
 		GridNode.new(dimensions.block), 
 		_createBlocks(dimensions), 
 		cursor, 
-		dimensions.grid)
+		dimensions)
 
 func _createCursor(dimensions) -> CursorModel :
 	var position = {
