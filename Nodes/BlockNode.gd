@@ -15,13 +15,15 @@ func init(blockSize:Vector2):
 	
 
 func configure(model):
+	# keep ref to child node corresponding to type
 	_typeNode = _node(model)
+	# set block size and margin
 	var mesh = _typeNode.mesh as QuadMesh
-	mesh.size = _bounds.size - Vector2(2,2)
+	mesh.size = _bounds.size - Vector2(2, 2)
+	# make block visible
 	_typeNode.visible = _visible
-	var pos:Vector2
-	pos.x = model.position.column * _bounds.size.x 
-	pos.y = (model.rows - model.position.row - 1) * _bounds.size.y + (model.position.column % 2) * _half.y
+	# move block on grid
+	var pos = Vector2(model.position.x, model.position.y)
 	position = pos + _half
 #	updatePosition(false)
 	

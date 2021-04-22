@@ -17,7 +17,7 @@ func _init():
 func _createGrid(cursor, dimensions) -> GridModel :
 	return GridModel.new(
 		GridNode.new(dimensions.block), 
-		_createBlocks(dimensions.grid), 
+		_createBlocks(dimensions), 
 		cursor, 
 		dimensions.grid)
 
@@ -32,16 +32,16 @@ func _createCursor(dimensions) -> CursorModel :
 		dimensions.grid
 	)
 
-func _createBlocks(grid) -> Array:
+func _createBlocks(dimensions) -> Array:
 	var state
 	var model:BlockModel
 	var blocks = []
 	var block = preload("res://Scenes/Block.tscn")
-	for row in range(0, grid.rows + grid.buffer):
-		for column in range(0, grid.columns):
+	for row in range(0, dimensions.grid.rows + dimensions.grid.buffer):
+		for column in range(0, dimensions.grid.columns):
 			state = {
 				position = {row = row, column = column},
-				grid = grid.duplicate(),
+				dimensions = dimensions.duplicate(true),
 				node = block.instance(),
 				type = BlockModel.shuffleType()
 			}

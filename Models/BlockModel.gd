@@ -52,11 +52,21 @@ func _init(state:Dictionary):
 func _onViewReady():
 	var model = {
 		type = _state.type,
-		position = _state.position,
-		rows = _state.grid.rows + _state.grid.buffer
+		position = _gridToNodePosition()
 	}
 	_state.node.configure(model)
-	
+
+func _gridToNodePosition() -> Dictionary:
+	var position = {}
+	var row = _state.position.row
+	var column = _state.position.column
+	var totalRows = _state.dimensions.grid.rows + _state.dimensions.grid.buffer
+	var width = _state.dimensions.block.width
+	var height = _state.dimensions.block.height
+	position.x = column * width 
+	position.y = (totalRows - row - 1) * height + (column % 2) * height / 2
+	return position
+
 func node():
 	return _state.node
 	
