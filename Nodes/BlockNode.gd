@@ -14,19 +14,25 @@ func init(blockSize:Vector2):
 	_half = blockSize / 2
 	
 
-func configure(model):
+func configure(state):
+	updateType(state.type)
+	# move block on grid
+	updatePosition(state.position)
+#	updatePosition(false)
+	
+func updatePosition(state):
+	var pos = Vector2(state.x, state.y)
+	position = pos + _half
+
+func updateType(state):
 	# keep ref to child node corresponding to type
-	_typeNode = _node(model)
+	_typeNode = _node(state)
 	# set block size and margin
 	var mesh = _typeNode.mesh as QuadMesh
 	mesh.size = _bounds.size - Vector2(2, 2)
 	# make block visible
-	_typeNode.visible = _visible
-	# move block on grid
-	var pos = Vector2(model.position.x, model.position.y)
-	position = pos + _half
-#	updatePosition(false)
-	
+	_resetVisibility()
+	setVisible(true)
 
 #func updatePosition(animate:bool=true):
 #	if !_model.needsDisplay() || _isUpdatingPosition:
@@ -66,8 +72,8 @@ func setVisible(value:bool):
 		return
 	_typeNode.visible = value
 
-func _node(model) -> MeshInstance2D:
-	match model.type:
+func _node(type) -> MeshInstance2D:
+	match type:
 		Enums.BlockType.A:
 			return get_node("A") as MeshInstance2D
 		Enums.BlockType.E:

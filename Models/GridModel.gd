@@ -1,38 +1,31 @@
 class_name GridModel
 
 class Diamond:
-	var _down:BlockModel
-	var _left:BlockModel
-	var _up:BlockModel
-	var _right:BlockModel
-	func _init(down:BlockModel, left:BlockModel, up:BlockModel, right:BlockModel):
-		_down = down
-		_left = left
-		_up = up
-		_right = right
-	func blocks() -> Array:
-		return [_down, _left, _up, _right]
+	var _blocks:Dictionary
+	var _grid
+	func _init(grid, blocks):
+		_blocks = blocks
+		_grid = grid
+	func blocks() -> Dictionary:
+		return _blocks.duplicate()
 	func haveSameType() -> bool:
-		return _down.type() == _left.type() && _left.type() == _up.type() && _up.type() == _right.type()
+		return (_blocks.down.type() == _blocks.left.type() 
+		&& _blocks.left.type() == _blocks.up.type() 
+		&& _blocks.up.type() == _blocks.right.type())
 	func rotate(rotation:int):
-		var grid:GridModel = _down.grid()
-		if grid==null:return
 		match rotation:
 			Enums.Rotation.Clockwise:
-				grid.swap(_down,_right)
-				grid.swap(_down,_up)
-				grid.swap(_down,_left)
+				_grid.swap(_blocks.down, _blocks.right)
+				_grid.swap(_blocks.down, _blocks.up)
+				_grid.swap(_blocks.down, _blocks.left)
 			Enums.Rotation.CounterClockwize:
-				grid.swap(_down,_left)
-				grid.swap(_down,_up)
-				grid.swap(_down,_right)
+				_grid.swap(_blocks.down, _blocks.left)
+				_grid.swap(_blocks.down, _blocks.up)
+				_grid.swap(_blocks.down, _blocks.right)
 			_:
 				pass
 
 var _blocks:Array
-var _columns:int
-var _rows:int
-var _visibleRows:int
 var _cursor:CursorModel
 var _node:Node
 var _dimensions
@@ -43,6 +36,7 @@ func _init(node, blocks, cursor, dimensions):
 	_cursor = cursor
 	_node.connect("ready", self, "_onViewReady")
 	_node.connect("mouseMoved", self, "_onMouseMoved")
+	_node.connect("rotate", self, "_onRotate")
 func _onViewReady():
 	var model = {
 		blocks = _blocks.duplicate()
@@ -54,20 +48,30 @@ func _onMouseMoved(pos):
 		dimensions = _dimensions
 	}
 	var block = BlockModel.nodePositionToGrid(state)
-	print(block)
+#	var diamond: Diamond = _diamondAt(block.row, block.column)
+#	if diamond != null :
+#		var blocks = diamond.blocks()
+#		print("Left:", blocks.left.type(),
+#		" Up:", blocks.up.type(),
+#		" Right:", blocks.right.type(),
+#		" Down:", blocks.down.type(),
+#		" Pos:", blocks.down.position())
 	_cursor.setPosition(block)
 func node():
 	return _node
 func blocks() -> Array:
 	return _blocks.duplicate()
 func columns() -> int :
-	return _columns
+	return _dimensions.grid.columns
 func visibleRows() -> int :
-	return _visibleRows
+	return _dimensions.grid.rows
 func rows() -> int :
-	return _rows
+	return _dimensions.grid.rows + _dimensions.grid.buffer
 func _blockAt(row, column) -> BlockModel :
-	if (row < 0 || row + 1 > _rows || column < 0 || column + 1 > _columns) :
+	if (row < 0 
+	|| row + 1 > _dimensions.grid.rows + _dimensions.grid.buffer
+	|| column < 0 
+	|| column + 1 > _dimensions.grid.columns) :
 		return null
 	return _blocks[_blockIndex(row, column)]
 func blockAt(pos:Dictionary) -> BlockModel :
@@ -91,32 +95,47 @@ func blockRelativeTo(block, location:int) -> BlockModel:
 			return null
 	return blockAt(pos)
 func _blockIndex(row, column) -> int:
-	return column + row * _columns
+	return column + row * _dimensions.grid.columns
 func blockIndex(pos:Dictionary) -> int :
 	return _blockIndex(pos.row, pos.column)
 func move(block:BlockModel, pos:Dictionary):
 	block.setPosition(pos)
 	_blocks[blockIndex(pos)] = block
 func _evaluate():
-	for row in range(0, visibleRows() - 2):
-		for column in range(1, columns() - 2):
+	for row in range(0, visibleRows() - 1):
+		for column in range(1, columns() - 1):
 			var diamond: Diamond = _diamondAt(row, column)
-			if diamond == null : continue
+			if diamond == null : 
+				print("null diamond")
+				continue
+			if diamond != null :
+				var blocks = diamond.blocks()
+#				print("Eval Left:", blocks.left.type(),
+#				" Up:", blocks.up.type(),
+#				" Right:", blocks.right.type(),
+#				" Down:", blocks.down.type(),
+#				" Pos:", blocks.down.position())
 			if !diamond.haveSameType():
 				continue
-			for block in diamond.blocks():
+			for block in diamond.blocks().values():
 				breakSingle(block)
 			pass
 func _diamondAt(row, column) -> Diamond:
 	var down = _blockAt(row, column)
 	if down == null: return null
-	var top = down.blockAt(Enums.Location.Over)
-	if top == null: return null
-	var left = down.blockAt(Enums.Location.LeftSide)
+	var up = blockRelativeTo(down, Enums.Location.Over)
+	if up == null: return null
+	var left = blockRelativeTo(down, Enums.Location.LeftSide)
 	if left == null: return null
-	var right = down.blockAt(Enums.Location.RightSide)
+	var right = blockRelativeTo(down, Enums.Location.RightSide)
 	if right == null: return null
-	return Diamond.new(down, left, top, right)
+	var blocks = {
+		up = up,
+		down = down,
+		left = left,
+		right = right
+	}
+	return Diamond.new(self, blocks)
 func cursor()->CursorModel:
 	return _cursor
 func swap(from:BlockModel, to:BlockModel):
@@ -125,16 +144,16 @@ func swap(from:BlockModel, to:BlockModel):
 	move(from, toPos)
 	move(to, fromPos)
 func breakSingle(block:BlockModel):
-	block.setType(Enums.BlockType.Empty)
-	while block.blockAt(Enums.Location.Over) != null :
-		swap(block, block.blockAt(Enums.Location.Over))
+	block.setType(BlockModel.shuffleType())
+	while blockRelativeTo(block, Enums.Location.Over) != null :
+		swap(block, blockRelativeTo(block, Enums.Location.Over))
 func breakDiamond():
 	var pos: Dictionary = _cursor.position()
 	var diamond: Diamond = _diamondAt(pos.row, pos.column)
 	if diamond == null: return
 	for block in diamond.blocks():
 		breakSingle(block)
-func rotate(rotation:int):
+func _onRotate(rotation:int):
 	var pos: Dictionary = _cursor.position()
 	var diamond: Diamond = _diamondAt(pos.row, pos.column)
 	if diamond == null: return

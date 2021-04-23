@@ -50,6 +50,9 @@ func _init(state:Dictionary):
 	state.node.connect("ready", self, "_onViewReady")
 	
 func _onViewReady():
+	_updateNode()
+	
+func _updateNode():
 	var model = {
 		type = _state.type,
 		position = gridToNodePosition(_state)
@@ -95,8 +98,10 @@ func type()->int:
 	return _state.type
 func setType(type:int):
 	_state.type = type
+	node().updateType(type)
 func position() -> Dictionary:
-	return _state.pos.duplicate()
+	return _state.position.duplicate()
 func setPosition(pos:Dictionary):
-	if _state.pos.row == pos.row && _state.pos.column == pos.column: return
-	_state.pos = pos.duplicate()
+	if _state.position.row == pos.row && _state.position.column == pos.column: return
+	_state.position = pos.duplicate()
+	node().updatePosition(gridToNodePosition(_state))

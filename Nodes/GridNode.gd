@@ -46,25 +46,17 @@ func configure(model):
 		add_child(node)
 
 func _input(event):
-	pass
 	if event is InputEventMouseMotion:
 		var local = make_canvas_position_local(event.position)
 		emit_signal("mouseMoved", {x = local.x, y = local.y})
-#	elif event is InputEventMouseButton:
-#		if event.pressed:
-#			var block:BlockNode = _overBlock(event.position)
-#			if block != null:
-#				if block.moveCursorToBlock() :
-#					_cursor.updatePosition()
-#			if event.button_index == 1:
-#				emit_signal("rotate", Enums.Rotation.Clockwise)
-##				_model.rotate(Enums.Rotation.Clockwise)
-#			else:
-#				emit_signal("rotate", Enums.Rotation.CounterClockwize)
-##				_model.rotate(Enums.Rotation.CounterClockwize)
-#			for child in get_children():
-#				if child is BlockNode:
-#					(child as BlockNode).updatePosition()
+	elif event is InputEventMouseButton:
+		var local = make_canvas_position_local(event.position)
+		if event.pressed:
+			emit_signal("mouseMoved", {x = local.x, y = local.y})
+			if event.button_index == 1:
+				emit_signal("rotate", Enums.Rotation.Clockwise)
+			else:
+				emit_signal("rotate", Enums.Rotation.CounterClockwize)
 #	elif event is InputEventKey:
 #		if event.pressed && event.scancode == KEY_SPACE:
 ##			_model.breakDiamond()
