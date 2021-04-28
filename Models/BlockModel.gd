@@ -71,8 +71,8 @@ static func gridToNodePosition(state) -> Dictionary:
 	var row = state.position.row
 	var column = state.position.column
 	var totalRows = state.dimensions.grid.rows + state.dimensions.grid.buffer
-	var width = state.dimensions.block.width
-	var height = state.dimensions.block.height
+	var width = state.appearance.block.width
+	var height = state.appearance.block.height
 	var offset = (column % 2) * height / 2
 	var x = column * width 
 	var y = (totalRows - row - 1) * height + offset
@@ -81,9 +81,9 @@ static func gridToNodePosition(state) -> Dictionary:
 static func nodePositionToGrid(state) -> Dictionary:
 	var x = state.position.x
 	var y = state.position.y
-	var totalRows = state.dimensions.grid.rows + state.dimensions.grid.buffer
-	var width = state.dimensions.block.width
-	var height = state.dimensions.block.height
+	var totalRows = state.level.dimensions.grid.rows + state.level.dimensions.grid.buffer
+	var width = state.level.appearance.block.width
+	var height = state.level.appearance.block.height
 	var column = int(x / width)
 	var offset = (column % 2) * height / 2
 	var row =  int(totalRows - ((y - offset) / height))

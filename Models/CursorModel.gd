@@ -3,10 +3,10 @@ class_name CursorModel
 var _pos
 var _node:Node
 var _grid
-func _init(node, pos, grid):
+func _init(node, pos, level):
 	_node = node
 	_pos = pos
-	_grid = grid
+	_grid = level.dimensions.grid
 	_node.connect("ready", self, "_onNodeReady")
 func _onNodeReady():
 	var state = {

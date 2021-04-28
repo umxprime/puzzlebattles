@@ -30,27 +30,25 @@ var WILLBREAK_STATE = BlockModel.WillBreakState.new()
 var BREAKING_STATE = BlockModel.BreakingState.new()
 var FALLING_STATE = BlockModel.FallingState.new()
 
-var _blocks:Array
 var _cursor:CursorModel
 var _node:Node
-var _dimensions
-func _init(node, blocks, cursor, dimensions):
-	_blocks = blocks
+var _level
+func _init(node, level, cursor):
+	_level = level.duplicate(true)
 	_node = node
-	_dimensions = dimensions
 	_cursor = cursor
 	_node.connect("ready", self, "_onViewReady")
 	_node.connect("mouseMoved", self, "_onMouseMoved")
 	_node.connect("rotate", self, "_onRotate")
 func _onViewReady():
 	var model = {
-		blocks = _blocks.duplicate()
+		blocks = _level.blocks.duplicate()
 	}
 	_node.configure(model)
 func _onMouseMoved(pos):
 	var state = {
 		position = pos,
-		dimensions = _dimensions
+		level = _level
 	}
 	var block = BlockModel.nodePositionToGrid(state)
 #	var diamond: Diamond = _diamondAt(block.row, block.column)
@@ -65,18 +63,18 @@ func _onMouseMoved(pos):
 func node():
 	return _node
 func blocks() -> Array:
-	return _blocks.duplicate()
+	return _level.blocks.duplicate()
 func columns() -> int :
-	return _dimensions.grid.columns
+	return _level.dimensions.grid.columns
 func visibleRows() -> int :
-	return _dimensions.grid.rows
+	return _level.dimensions.grid.rows
 func rows() -> int :
-	return _dimensions.grid.rows + _dimensions.grid.buffer
+	return _level.dimensions.grid.rows + _level.dimensions.grid.buffer
 func _blockAt(row, column, blocks) -> BlockModel :
 	if (row < 0 
-	|| row + 1 > _dimensions.grid.rows + _dimensions.grid.buffer
+	|| row + 1 > _level.dimensions.grid.rows + _level.dimensions.grid.buffer
 	|| column < 0 
-	|| column + 1 > _dimensions.grid.columns) :
+	|| column + 1 > _level.dimensions.grid.columns) :
 		return null
 	return blocks[_blockIndex(row, column)]
 func blockAt(pos:Dictionary, blocks) -> BlockModel :
@@ -108,12 +106,12 @@ func blockRelativeTo(block, location:int, blocks) -> BlockModel:
 			return null
 	return blockAt(pos, blocks)
 func _blockIndex(row, column) -> int:
-	return column + row * _dimensions.grid.columns
+	return column + row * _level.dimensions.grid.columns
 func blockIndex(pos:Dictionary) -> int :
 	return _blockIndex(pos.row, pos.column)
 func move(block:BlockModel, pos:Dictionary):
 	block.setPosition(pos)
-	_blocks[blockIndex(pos)] = block
+	_level.blocks[blockIndex(pos)] = block
 func _evaluate():
 	var blocksToEvaluate = blocks()
 	var blocksWillingToBreak = []
@@ -143,7 +141,7 @@ func _evaluate():
 func _evaluateSurroundings(block, blocksToEvaluate) -> Array :
 	var blocksWillingToBreak = []
 	for position in range(Enums.Direction.Up, Enums.Direction.RightDown):
-		var relative = blockRelativeTo(block, position, _blocks)
+		var relative = blockRelativeTo(block, position, _level.blocks)
 		if relative == null: continue
 		if blocksToEvaluate[blockIndex(relative.position())] == null : continue
 		if relative.type() != block.type():
@@ -154,13 +152,13 @@ func _evaluateSurroundings(block, blocksToEvaluate) -> Array :
 		blocksWillingToBreak += _evaluateSurroundings(relative, blocksToEvaluate)
 	return blocksWillingToBreak
 func _diamondAt(row, column) -> Diamond:
-	var down = _blockAt(row, column, _blocks)
+	var down = _blockAt(row, column, _level.blocks)
 	if down == null: return null
-	var up = blockRelativeTo(down, Enums.Direction.Up, _blocks)
+	var up = blockRelativeTo(down, Enums.Direction.Up, _level.blocks)
 	if up == null: return null
-	var left = blockRelativeTo(down, Enums.Direction.LeftUp, _blocks)
+	var left = blockRelativeTo(down, Enums.Direction.LeftUp, _level.blocks)
 	if left == null: return null
-	var right = blockRelativeTo(down, Enums.Direction.RightUp, _blocks)
+	var right = blockRelativeTo(down, Enums.Direction.RightUp, _level.blocks)
 	if right == null: return null
 	var blocks = {
 		up = up,
@@ -178,8 +176,8 @@ func swap(from:BlockModel, to:BlockModel):
 	move(to, fromPos)
 func breakSingle(block:BlockModel):
 	block.setType(BlockModel.shuffleType())
-	while blockRelativeTo(block, Enums.Direction.Up, _blocks) != null :
-		swap(block, blockRelativeTo(block, Enums.Direction.Up, _blocks))
+	while blockRelativeTo(block, Enums.Direction.Up, _level.blocks) != null :
+		swap(block, blockRelativeTo(block, Enums.Direction.Up, _level.blocks))
 func breakDiamond():
 	var pos: Dictionary = _cursor.position()
 	var diamond: Diamond = _diamondAt(pos.row, pos.column)

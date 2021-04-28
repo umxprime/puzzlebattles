@@ -4,8 +4,8 @@ class_name CursorNode
 
 var _cellSize:Vector2
 
-func _init(dimensions):
-	_cellSize = Vector2(dimensions.width, dimensions.height)
+func _init(level):
+	_cellSize = Vector2(level.appearance.block.width, level.appearance.block.height)
 
 func configure(state):
 	updatePosition(state)

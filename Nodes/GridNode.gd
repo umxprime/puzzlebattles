@@ -35,8 +35,8 @@ signal rotate
 signal breakDiamond
 signal mouseMoved
 
-func _init(size):
-	_blockSize=size
+func _init(appearance):
+	_blockSize=appearance.block
 
 func configure(model):
 	var node
