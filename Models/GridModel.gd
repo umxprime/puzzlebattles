@@ -128,6 +128,8 @@ func _evaluate():
 #				" Pos:", blocks.down.position())
 			if !diamond.haveSameType():
 				continue
+			if diamond.blocks().up.type() < Enums.BlockType.A :
+				continue
 			var blocks = diamond.blocks().values()
 			blocksWillingToBreak += blocks
 			for block in blocks:
@@ -175,7 +177,11 @@ func swap(from:BlockModel, to:BlockModel):
 	move(from, toPos)
 	move(to, fromPos)
 func breakSingle(block:BlockModel):
-	block.setType(BlockModel.shuffleType())
+	match _level.insertion :
+		Enums.BlockInsertion.Shuffle :
+			block.setType(BlockModel.shuffleType())
+		Enums.BlockInsertion.Unknown :
+			block.setType(Enums.BlockType.Unknown)
 	while blockRelativeTo(block, Enums.Direction.Up, _level.blocks) != null :
 		swap(block, blockRelativeTo(block, Enums.Direction.Up, _level.blocks))
 func breakDiamond():

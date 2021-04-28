@@ -13,6 +13,11 @@ enum BlockType {
 	Y = 7
 }
 
+enum BlockInsertion {
+	Unknown,
+	Shuffle
+}
+
 enum Direction {
 	Up,
 	Down

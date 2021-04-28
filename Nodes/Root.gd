@@ -7,7 +7,7 @@ var _cursor:CursorModel
 var _level:Dictionary
 
 func _init():
-	_level = _createLevel()
+	_level = _createTestLevel()
 	_cursor = _createCursor(_level)
 	_grid = _createGrid(_cursor, _level)
 
@@ -28,7 +28,7 @@ func _createCursor(level) -> CursorModel :
 		level
 	)
 
-func _createLevel() -> Dictionary:
+func _createRandomLevel() -> Dictionary:
 	var dimensions = {
 		grid={rows=10, columns=8, buffer=10}
 	}
@@ -53,7 +53,51 @@ func _createLevel() -> Dictionary:
 	return {
 		dimensions = dimensions,
 		blocks = blocks,
-		appearance = appearance
+		appearance = appearance,
+		insertion = Enums.BlockInsertion.Shuffle
+	}
+
+func _createTestLevel() -> Dictionary:
+	var dimensions = {
+		grid={rows=10, columns=8, buffer=0}
+	}
+	var appearance = {
+		block = {width=46,height=50}
+	}
+	var level = [
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 2, 0, 0, 0],
+		[0, 0, 0, 2, 2, 2, 2, 2],
+		[0, 0, 0, 0, 2, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 2, 2, 0, 0, 0],
+		[0, 0, 2, 2, 2, 2, 2, 0],
+	]
+	dimensions.grid.rows = level.size()
+	
+	var state
+	var model:BlockModel
+	var blocks = []
+	var block = preload("res://Scenes/Block.tscn")
+	for row in range(0, dimensions.grid.rows):
+		for column in range(0, dimensions.grid.columns):
+			state = {
+				position = {row = row, column = column},
+				dimensions = dimensions.duplicate(true),
+				appearance = appearance.duplicate(true),
+				node = block.instance(),
+				type = Enums.BlockType.Unknown + level[level.size() - row - 1][column]
+			}
+			model = BlockModel.new(state)
+			blocks.append(model)
+	return {
+		dimensions = dimensions,
+		blocks = blocks,
+		appearance = appearance,
+		insertion = Enums.BlockInsertion.Unknown
 	}
 
 func _clipGrid(level):

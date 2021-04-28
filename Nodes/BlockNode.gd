@@ -25,13 +25,14 @@ func updatePosition(state):
 	position = pos + _half
 
 func updateType(state):
+	_resetVisibility()
 	# keep ref to child node corresponding to type
 	_typeNode = _node(state)
+	if _typeNode == null : return
 	# set block size and margin
 	var mesh = _typeNode.mesh as QuadMesh
 	mesh.size = _bounds.size - Vector2(2, 2)
 	# make block visible
-	_resetVisibility()
 	setVisible(true)
 
 #func updatePosition(animate:bool=true):
