@@ -13,18 +13,13 @@ enum BlockType {
 	Y = 7
 }
 
-enum Location {
-	Over,
-	Under,
-	LeftSide,
-	RightSide
-}
-
 enum Direction {
 	Up,
 	Down
-	Left,
-	Up
+	LeftUp,
+	RightUp,
+	LeftDown,
+	RightDown,
 }
 
 enum Rotation {

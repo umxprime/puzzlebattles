@@ -3,7 +3,7 @@ extends Control
 class_name Root
 
 const dimensions = {
-	grid={rows=10, columns=8, buffer=2},
+	grid={rows=10, columns=8, buffer=10},
 	block={width=46,height=50}
 }
 

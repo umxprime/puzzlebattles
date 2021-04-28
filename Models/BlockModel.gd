@@ -1,45 +1,52 @@
 class_name BlockModel
 
-class BlockState:
-	var _model: BlockModel
-	func _init(model:BlockModel):
-		_model = model
+class State:
 	func enter():pass
-	func handle(state:BlockState) -> BlockState:
+	func handle(state:State) -> State:
 		return self
 	func exit():pass
 
-class BlockWaitState:
-	extends BlockState
-	func handle(state:BlockState) -> BlockState:
+class DefaultState:
+	extends State
+	func handle(state:State) -> State:
 		return state
 
-class BlockRotateState:
-	extends BlockState
+class WillBreakState:
+	extends State
+	var markedForDeletion:bool = false
+	func handle(state:State) -> State:
+		if state is BreakingState:
+			return state 
+		return self
+
+class RotateState:
+	extends State
 	var _rotated: bool = false
 	func enter():
 		pass
-	func handle(state:BlockState) -> BlockState:
+	func handle(state:State) -> State:
 		if !_rotated : return self
 		return state
 
-class BlockBreakState:
-	extends BlockState
-	var _broken: bool = false
+class BreakingState:
+	extends State
+	signal finished
+	var _broken:bool
 	func enter():
+		_broken = false
 		pass
-	func handle(state:BlockState) -> BlockState:
-		if !_broken : return self
-		return state
+	func handle(state:State) -> State:
+		if _broken && state is DefaultState:
+			return state
+		return self
 	func _finished():
 		_broken = true
-		_model.setState(BlockWaitState.new(_model))
+		emit_signal("finished")
 
-class BlockFallState:
-	extends BlockState
+class FallingState:
+	extends State
 
 var _state
-
 signal stateChanged(from, to)
 
 static func shuffleType()->int:
@@ -47,6 +54,7 @@ static func shuffleType()->int:
 	
 func _init(state:Dictionary):
 	_state = state.duplicate(true)
+	_state.state = DefaultState.new()
 	state.node.connect("ready", self, "_onViewReady")
 	
 func _onViewReady():
@@ -84,16 +92,19 @@ static func nodePositionToGrid(state) -> Dictionary:
 func node():
 	return _state.node
 	
-#func setState(state:BlockState) -> bool:
-#	var newState: BlockState = _state.handle(state)
-#	var stateChanged: bool = _state != newState
-#	if stateChanged:
-#		_state.exit()
-#		var previousState = _state
-#		_state = newState
-#		_state.enter()
-#		emit_signal("stateChanged", previousState, newState)
-#	return stateChanged
+func setState(state:State) -> bool:
+	var currentState: State = _state.state
+	var newState: State = currentState.handle(state)
+	var stateChanged: bool = currentState != newState
+	if stateChanged:
+		var previousState = currentState
+		previousState.exit()
+		_state.state = newState
+		newState.enter()
+		emit_signal("stateChanged", previousState, newState)
+	return stateChanged
+func state() -> State:
+	return _state.state
 func type()->int:
 	return _state.type
 func setType(type:int):
