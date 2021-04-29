@@ -116,3 +116,5 @@ func setPosition(pos:Dictionary):
 	if _state.position.row == pos.row && _state.position.column == pos.column: return
 	_state.position = pos.duplicate()
 	node().updatePosition(gridToNodePosition(_state))
+func mark():
+	node().mark()

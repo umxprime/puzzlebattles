@@ -73,6 +73,9 @@ func setVisible(value:bool):
 		return
 	_typeNode.visible = value
 
+func mark():
+	get_node("mark").visible = true
+
 func _node(type) -> MeshInstance2D:
 	match type:
 		Enums.BlockType.A:
