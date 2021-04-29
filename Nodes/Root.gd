@@ -65,31 +65,32 @@ func _createTestLevel() -> Dictionary:
 		block = {width=46,height=50}
 	}
 	var level = [
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 2, 0, 0, 0],
-		[0, 0, 0, 2, 2, 2, 2, 2],
-		[0, 0, 0, 0, 2, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 2, 2, 0, 0, 0],
-		[0, 0, 2, 2, 2, 2, 2, 0],
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 2, 0, 0, 0, 0,
+		0, 0, 0, 2, 2, 2, 0, 2,
+		0, 0, 0, 0, 2, 0, 2, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 2, 2, 0, 0, 0,
+		0, 0, 2, 2, 2, 2, 2, 0,
 	]
-	dimensions.grid.rows = level.size()
 	
 	var state
 	var model:BlockModel
 	var blocks = []
 	var block = preload("res://Scenes/Block.tscn")
+	var index
 	for row in range(0, dimensions.grid.rows):
 		for column in range(0, dimensions.grid.columns):
+			index = level.size() - ((row+1)*dimensions.grid.columns-column)
 			state = {
 				position = {row = row, column = column},
 				dimensions = dimensions.duplicate(true),
 				appearance = appearance.duplicate(true),
 				node = block.instance(),
-				type = Enums.BlockType.Unknown + level[level.size() - row - 1][column]
+				type = Enums.BlockType.Unknown + level[index]
 			}
 			model = BlockModel.new(state)
 			blocks.append(model)
