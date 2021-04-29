@@ -7,7 +7,7 @@ var _cursor:CursorModel
 var _level:Dictionary
 
 func _init():
-	_level = _createTestLevel()
+	_level = _createRandomLevel()
 	_cursor = _createCursor(_level)
 	_grid = _createGrid(_cursor, _level)
 
