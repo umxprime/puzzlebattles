@@ -2,6 +2,34 @@ extends Node2D
 
 class_name GridNode
 
+class ComboBreakAnimation:
+	var _tween:Tween
+	var _blocks:Array
+	var _parent:Node
+	var _started:bool
+	signal finished
+	func _init(parent:Node, blocks:Array):
+		_blocks = blocks
+		_parent = parent
+		_tween = Tween.new()
+		_started = false
+	func started() -> bool:
+		return _started
+	func start():
+		if _started:return
+		_started = true
+		_parent.add_child(_tween)
+		_tween.connect("tween_all_completed", self, "_finished")
+		for block in _blocks:
+			var node:Node2D = block.node()
+			_tween.interpolate_property(node, "scale", node.scale, Vector2(0,0),.5,Tween.TRANS_LINEAR,Tween.EASE_IN_OUT)
+		_tween.start()
+	func _finished():
+		for block in _blocks:
+			var node:Node2D = block.node()
+			node.scale = Vector2(1,1)
+		emit_signal("finished", _blocks)
+
 class DiamondRotateAnimation:
 	var _tween:Tween
 	var _blocks:Array

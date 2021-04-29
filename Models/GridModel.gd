@@ -112,7 +112,11 @@ func blockIndex(pos:Dictionary) -> int :
 func move(block:BlockModel, pos:Dictionary):
 	block.setPosition(pos)
 	_level.blocks[blockIndex(pos)] = block
+	
+var _animation
 func _evaluate():
+	if _animation != null :
+		return
 	var blocksToEvaluate = blocks()
 	var blocksWillingToBreak = []
 	for row in range(0, visibleRows() - 1):
@@ -137,9 +141,17 @@ func _evaluate():
 #				block.setState(WILLBREAK_STATE)
 				blocksWillingToBreak += _evaluateSurroundings(block, blocksToEvaluate)
 #				breakSingle(block)
-	for block in blocksWillingToBreak:
+	if blocksWillingToBreak.size() == 0 :
+		return
+	_animation = GridNode.ComboBreakAnimation.new(_node, blocksWillingToBreak)
+	_animation.connect("finished", self, "_comboBreakAnimFinished")
+	_animation.start()
+func _comboBreakAnimFinished(blocks) :
+	_animation = null
+	for block in blocks:
 		breakSingle(block)
 #		block.setState(BREAKING_STATE)
+	_evaluate()
 func _evaluateSurroundings(block, blocksToEvaluate) -> Array :
 	var blocksWillingToBreak = []
 	for position in range(Enums.Direction.Up, Enums.Direction.RightDown + 1):
