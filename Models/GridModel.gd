@@ -142,7 +142,7 @@ func _evaluate():
 #		block.setState(BREAKING_STATE)
 func _evaluateSurroundings(block, blocksToEvaluate) -> Array :
 	var blocksWillingToBreak = []
-	for position in range(Enums.Direction.Up, Enums.Direction.RightDown):
+	for position in range(Enums.Direction.Up, Enums.Direction.RightDown + 1):
 		var relative = blockRelativeTo(block, position, _level.blocks)
 		if relative == null: continue
 		if blocksToEvaluate[blockIndex(relative.position())] == null : continue
